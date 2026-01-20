@@ -1,0 +1,188 @@
+/* --- General Styles --- */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    width: 450px;
+    min-height: 100px;
+    max-height: 500px;
+    padding: 12px;
+    background-color: #f7f8fa;
+    color: #172b4d;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Header --- */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #dfe1e6;
+    flex-shrink: 0;
+}
+
+.title h1 {
+    font-size: 16px;
+    margin: 0;
+    color: #091e42;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#monitoring-label {
+    font-size: 12px;
+    cursor: pointer;
+    color: #42526e;
+}
+
+#clear-logs-btn {
+    background-color: #fbecec;
+    color: #de350b;
+    border: 1px solid transparent;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+}
+#clear-logs-btn:hover {
+    background-color: #f8d3d3;
+}
+#clear-logs-btn:active {
+    background-color: #f5baba;
+    border-color: #de350b;
+}
+
+/* --- Toggle Switch --- */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+}
+.switch input { display: none; }
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #dfe1e6;
+    transition: .2s;
+    border-radius: 20px;
+}
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .2s;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+input:checked + .slider {
+    background-color: #0065ff;
+}
+input:checked + .slider:before {
+    transform: translateX(16px);
+}
+
+/* --- Logs Container --- */
+#logs-container {
+    margin-top: 10px;
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 5px; /* For scrollbar */
+}
+
+.empty-state {
+    color: #5e6c84;
+    text-align: center;
+    padding: 30px 10px;
+    font-size: 14px;
+}
+
+.log-entry {
+    background-color: #ffffff;
+    border: 1px solid #dfe1e6;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    box-shadow: 0 1px 2px rgba(9,30,66,0.08);
+}
+
+.log-header {
+    font-weight: bold;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.log-header .library {
+    color: #0052cc;
+    background-color: #e7f0ff;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+.log-header .method {
+    color: #4c9aff;
+}
+.log-header .timestamp {
+    font-size: 10px;
+    color: #5e6c84;
+    font-weight: normal;
+}
+
+.log-data {
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+    background: linear-gradient(180deg, #fbfcfe 0%, #f7f9fb 100%);
+    padding: 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    color: #172b4d;
+}
+
+/* 让代码字体略微加粗，提升可读性 */
+.log-data code { font-weight: 600; }
+
+/* 简易语法高亮 */
+.log-data code .hl-key { color: #6f42c1; font-weight: 600; }
+.log-data code .hl-string { color: #0366d6; }
+.log-data code .hl-number { color: #e36209; }
+.log-data code .hl-boolean { color: #d73a49; }
+.log-data code .hl-null { color: #6a737d; font-style: italic; }
+.log-data code .hl-punc { color: #9aa4b2; }
+
+/* 行号 */
+.log-data code .code-line { display: block; }
+.log-data code .line-no {
+    display: inline-block;
+    width: 2.2em;
+    user-select: none;
+    color: #a0aec0;
+    font-weight: 400; /* 行号保持较细以对比主体代码 */
+}
+.log-data code .line-text { display: inline; }
+
+/* 明文/密文摘要高亮 */
+.log-summary { margin-bottom: 6px; }
+.summary-item { margin: 2px 0; padding: 2px 4px; border-radius: 3px; }
+.summary-item.plaintext { background-color: #eaf3ff; }
+.summary-item.ciphertext { background-color: #fff5ea; }
+.summary-item strong { color: #0052cc; }
+.summary-item .summary-text.full { color: #172b4d; }
+.summary-item .summary-text.truncated { color: #172b4d; }
+.summary-item .toggle-more { margin-left: 6px; color: #0052cc; text-decoration: none; font-size: 11px; }
+.summary-item .toggle-more:hover { text-decoration: underline; }

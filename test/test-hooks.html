@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Detective - Hook Test Suite</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    h1 { color: #333; }
+    .section {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .section h2 { margin-top: 0; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+    button {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 5px;
+    }
+    button:hover { background: #2980b9; }
+    button:active { transform: translateY(1px); }
+    .result {
+      background: #f8f9fa;
+      border-left: 4px solid #3498db;
+      padding: 10px;
+      margin: 10px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .success { border-left-color: #27ae60; }
+    .error { border-left-color: #e74c3c; }
+    .warning { border-left-color: #f39c12; }
+    .status {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    .status.pass { background: #d4edda; color: #155724; }
+    .status.fail { background: #f8d7da; color: #721c24; }
+    .note {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 4px;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Crypto Detective - Hook Test Suite</h1>
+  <div class="note">
+    ℹ️ Open this page with the Crypto Detective extension installed and check the DevTools panel to see captured logs.
+  </div>
+
+  <!-- Web Crypto API Tests -->
+  <div class="section">
+    <h2>Web Crypto API Tests</h2>
+
+    <h3>1. deriveKey (ECDH Key Derivation)</h3>
+    <button onclick="testDeriveKey()">Test deriveKey</button>
+    <div id="deriveKey-result" class="result" style="display:none"></div>
+
+    <h3>2. deriveBits (HKDF)</h3>
+    <button onclick="testDeriveBits()">Test deriveBits</button>
+    <div id="deriveBits-result" class="result" style="display:none"></div>
+
+    <h3>3. verify (Signature Verification)</h3>
+    <button onclick="testVerify()">Test verify</button>
+    <div id="verify-result" class="result" style="display:none"></div>
+
+    <h3>4. generateKey</h3>
+    <button onclick="testGenerateKey()">Test generateKey (AES-GCM)</button>
+    <div id="generateKey-result" class="result" style="display:none"></div>
+
+    <h3>5. importKey / exportKey</h3>
+    <button onclick="testImportExportKey()">Test importKey/exportKey</button>
+    <div id="importExportKey-result" class="result" style="display:none"></div>
+  </div>
+
+  <!-- CryptoJS Tests -->
+  <div class="section">
+    <h2>CryptoJS Tests</h2>
+
+    <h3>1. HMAC (Hash-based Message Authentication Code)</h3>
+    <button onclick="testHmacSHA256()">Test HMAC-SHA256</button>
+    <button onclick="testHmacSHA1()">Test HMAC-SHA1</button>
+    <button onclick="testHmacMD5()">Test HMAC-MD5</button>
+    <div id="hmac-result" class="result" style="display:none"></div>
+
+    <h3>2. PBKDF2 (Password-Based Key Derivation)</h3>
+    <button onclick="testPBKDF2()">Test PBKDF2</button>
+    <div id="pbkdf2-result" class="result" style="display:none"></div>
+
+    <h3>3. EvpKDF (OpenSSL Key Derivation)</h3>
+    <button onclick="testEvpKDF()">Test EvpKDF</button>
+    <div id="evpkdf-result" class="result" style="display:none"></div>
+
+    <h3>4. DES Encryption</h3>
+    <button onclick="testDES()">Test DES (CBC mode)</button>
+    <button onclick="testDES_ECB()">Test DES (ECB mode)</button>
+    <div id="des-result" class="result" style="display:none"></div>
+
+    <h3>5. TripleDES Encryption</h3>
+    <button onclick="testTripleDES()">Test TripleDES</button>
+    <div id="tripledes-result" class="result" style="display:none"></div>
+
+    <h3>6. Rabbit & RC4 Stream Ciphers</h3>
+    <button onclick="testRabbit()">Test Rabbit</button>
+    <button onclick="testRC4()">Test RC4</button>
+    <div id="stream-result" class="result" style="display:none"></div>
+
+    <h3>7. AES with Different Modes & Padding</h3>
+    <button onclick="testAES_CBC()">Test AES-CBC</button>
+    <button onclick="testAES_CTR()">Test AES-CTR</button>
+    <button onclick="testAES_OFB()">Test AES-OFB</button>
+    <button onclick="testAES_GCM()">Test AES-GCM (CFB)</button>
+    <div id="aes-modes-result" class="result" style="display:none"></div>
+  </div>
+
+  <!-- Forge.js Tests -->
+  <div class="section">
+    <h2>Forge.js Tests</h2>
+
+    <h3>1. PBKDF2</h3>
+    <button onclick="testForgePBKDF2()">Test Forge PBKDF2</button>
+    <div id="forge-pbkdf2-result" class="result" style="display:none"></div>
+
+    <h3>2. HMAC</h3>
+    <button onclick="testForgeHMAC()">Test Forge HMAC-SHA256</button>
+    <div id="forge-hmac-result" class="result" style="display:none"></div>
+
+    <h3>3. RSA Public Key Encryption</h3>
+    <button onclick="testForgeRSAEncrypt()">Test RSA Encrypt</button>
+    <button onclick="testForgeRSADecrypt()">Test RSA Decrypt</button>
+    <div id="forge-rsa-result" class="result" style="display:none"></div>
+
+    <h3>4. RSA Signing & Verification</h3>
+    <button onclick="testForgeRSASign()">Test RSA Sign</button>
+    <button onclick="testForgeRSAVerify()">Test RSA Verify</button>
+    <div id="forge-rsa-sig-result" class="result" style="display:none"></div>
+
+    <h3>5. Random Bytes</h3>
+    <button onclick="testForgeRandom()">Test Random.getBytes</button>
+    <div id="forge-random-result" class="result" style="display:none"></div>
+  </div>
+
+  <!-- libsodium.js Tests -->
+  <div class="section">
+    <h2>libsodium.js Tests (P2/P3 Features)</h2>
+
+    <h3>1. XChaCha20-Poly1305 AEAD</h3>
+    <button onclick="testSodiumXChaCha20()">Test XChaCha20-Poly1305-IETF</button>
+    <div id="sodium-xchacha20-result" class="result" style="display:none"></div>
+
+    <h3>2. Ed25519 Signatures</h3>
+    <button onclick="testSodiumSign()">Test Ed25519 Sign</button>
+    <button onclick="testSodiumVerify()">Test Ed25519 Verify</button>
+    <div id="sodium-sign-result" class="result" style="display:none"></div>
+
+    <h3>3. Argon2 Password Hashing</h3>
+    <button onclick="testSodiumArgon2()">Test Argon2ID</button>
+    <div id="sodium-argon2-result" class="result" style="display:none"></div>
+
+    <h3>4. BLAKE2b Hash</h3>
+    <button onclick="testSodiumBlake2()">Test BLAKE2b</button>
+    <div id="sodium-blake2-result" class="result" style="display:none"></div>
+
+    <h3>5. SecretBox (XSalsa20-Poly1305)</h3>
+    <button onclick="testSodiumSecretBox()">Test SecretBox</button>
+    <div id="sodium-secretbox-result" class="result" style="display:none"></div>
+  </div>
+
+  <!-- P3 Feature Tests -->
+  <div class="section">
+    <h2>P3 Feature Tests - Stack Trace, Performance & Warnings</h2>
+
+    <h3>1. Performance Monitoring</h3>
+    <button onclick="testPerformanceMonitoring()">Test Performance (slow operations)</button>
+    <div id="performance-result" class="result" style="display:none"></div>
+
+    <h3>2. Weak Crypto Warnings</h3>
+    <button onclick="testWeakCryptoWarning()">Test Weak Crypto Detection (MD5)</button>
+    <button onclick="testWeakCryptoWarning2()">Test Weak Crypto Detection (DES)</button>
+    <div id="weak-crypto-result" class="result" style="display:none"></div>
+
+    <h3>3. Stack Trace</h3>
+    <button onclick="testStackTrace()">Test Stack Trace Capture</button>
+    <div id="stack-trace-result" class="result" style="display:none"></div>
+  </div>
+
+  <!-- Run All Tests -->
+  <div class="section">
+    <h2>Run All Tests</h2>
+    <button onclick="runAllTests()" style="background: #27ae60; font-size: 16px; padding: 15px 30px;">
+      🚀 Run All Tests
+    </button>
+    <div id="allTests-result" class="result" style="display:none"></div>
+  </div>
+
+  <!-- CryptoJS CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+  <!-- Forge.js CDN (for P1 tests) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/forge/1.3.1/forge.min.js"></script>
+
+  <!-- libsodium.js CDN (for P2 tests) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/libsodiumjs-sumo/0.7.13/libsodium-sumo.min.js"></script>
+
+  <script>
+    // Utility function to display results
+    function showResult(elementId, message, isSuccess = true) {
+      const el = document.getElementById(elementId);
+      el.style.display = 'block';
+      el.textContent = message;
+      el.className = 'result ' + (isSuccess ? 'success' : 'error');
+    }
+
+    function arrayBufferToHex(buffer) {
+      return Array.from(new Uint8Array(buffer))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+    }
+
+    // ============================================
+    // Web Crypto API Tests
+    // ============================================
+
+    async function testDeriveKey() {
+      try {
+        // Generate ECDH key pair
+        const keyPair = await crypto.subtle.generateKey(
+          { name: 'ECDH', namedCurve: 'P-256' },
+          true,
+          ['deriveKey', 'deriveBits']
+        );
+
+        // Derive a shared secret
+        const derivedKey = await crypto.subtle.deriveKey(
+          { name: 'ECDH', public: keyPair.publicKey },
+          keyPair.privateKey,
+          { name: 'AES-GCM', length: 256 },
+          true,
+          ['encrypt', 'decrypt']
+        );
+
+        showResult('deriveKey-result',
+          `✓ deriveKey successful!\n` +
+          `Derived Key Algorithm: ${derivedKey.algorithm.name}\n` +
+          `Extractable: ${derivedKey.extractable}\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('deriveKey-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    async function testDeriveBits() {
+      try {
+        // Generate ECDH key pair
+        const keyPair = await crypto.subtle.generateKey(
+          { name: 'ECDH', namedCurve: 'P-256' },
+          true,
+          ['deriveBits']
+        );
+
+        // Derive bits
+        const derivedBits = await crypto.subtle.deriveBits(
+          { name: 'ECDH', public: keyPair.publicKey },
+          keyPair.privateKey,
+          256
+        );
+
+        showResult('deriveBits-result',
+          `✓ deriveBits successful!\n` +
+          `Derived bits length: ${derivedBits.byteLength * 8} bits\n` +
+          `Derived bits (hex): ${arrayBufferToHex(derivedBits).substring(0, 32)}...\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('deriveBits-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    async function testVerify() {
+      try {
+        // Generate RSA key pair for signing
+        const keyPair = await crypto.subtle.generateKey(
+          { name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' },
+          true,
+          ['sign', 'verify']
+        );
+
+        const message = new TextEncoder().encode('Hello, Crypto Detective!');
+        const signature = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', keyPair.privateKey, message);
+
+        // Verify the signature
+        const isValid = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', keyPair.publicKey, signature, message);
+
+        showResult('verify-result',
+          `✓ verify successful!\n` +
+          `Signature valid: ${isValid}\n` +
+          `Message: "Hello, Crypto Detective!"\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('verify-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    async function testGenerateKey() {
+      try {
+        const key = await crypto.subtle.generateKey(
+          { name: 'AES-GCM', length: 256 },
+          true,
+          ['encrypt', 'decrypt']
+        );
+
+        showResult('generateKey-result',
+          `✓ generateKey successful!\n` +
+          `Key type: ${key.type}\n` +
+          `Algorithm: ${key.algorithm.name}\n` +
+          `Extractable: ${key.extractable}\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('generateKey-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    async function testImportExportKey() {
+      try {
+        // Export a key
+        const keyPair = await crypto.subtle.generateKey(
+          { name: 'ECDH', namedCurve: 'P-256' },
+          true,
+          ['deriveKey']
+        );
+
+        const exportedKey = await crypto.subtle.exportKey('raw', keyPair.publicKey);
+
+        // Import it back
+        const importedKey = await crypto.subtle.importKey(
+          'raw',
+          exportedKey,
+          { name: 'ECDH', namedCurve: 'P-256' },
+          true,
+          []
+        );
+
+        showResult('importExportKey-result',
+          `✓ importKey/exportKey successful!\n` +
+          `Exported key (hex): ${arrayBufferToHex(exportedKey).substring(0, 32)}...\n` +
+          `Imported key type: ${importedKey.type}\n` +
+          `Check DevTools panel for captured logs.`
+        );
+      } catch (error) {
+        showResult('importExportKey-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    // ============================================
+    // CryptoJS Tests
+    // ============================================
+
+    function testHmacSHA256() {
+      try {
+        const key = 'secret-key';
+        const message = 'Hello, Crypto Detective!';
+
+        const hmac = CryptoJS.HmacSHA256(message, key).toString();
+
+        showResult('hmac-result',
+          `✓ HMAC-SHA256 successful!\n` +
+          `Key: "${key}"\n` +
+          `Message: "${message}"\n` +
+          `HMAC (hex): ${hmac}\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('hmac-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    function testHmacSHA1() {
+      try {
+        const key = 'secret-key';
+        const message = 'Hello, Crypto Detective!';
+
+        const hmac = CryptoJS.HmacSHA1(message, key).toString();
+
+        showResult('hmac-result',
+          `✓ HMAC-SHA1 successful!\n` +
+          `Key: "${key}"\n` +
+          `Message: "${message}"\n` +
+          `HMAC (hex): ${hmac}\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('hmac-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    function testHmacMD5() {
+      try {
+        const key = 'secret-key';
+        const message = 'Hello, Crypto Detective!';
+
+        const hmac = CryptoJS.HmacMD5(message, key).toString();
+
+        showResult('hmac-result',
+          `✓ HMAC-MD5 successful!\n` +
+          `Key: "${key}"\n` +
+          `Message: "${message}"\n` +
+          `HMAC (hex): ${hmac}\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('hmac-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    function testPBKDF2() {
+      try {
+        const password = 'my-secure-password';
+        const salt = 'random-salt';
+        const keySize = 256 / 32; // 256 bits
+        const iterations = 10000;
+
+        const derivedKey = CryptoJS.PBKDF2(password, salt, {
+          keySize: keySize,
+          iterations: iterations
+        }).toString();
+
+        showResult('pbkdf2-result',
+          `✓ PBKDF2 successful!\n` +
+          `Password: "${password}"\n` +
+          `Salt: "${salt}"\n` +
+          `Iterations: ${iterations}\n` +
+          `Key size: ${keySize * 32} bits\n` +
+          `Derived key (hex): ${derivedKey.substring(0, 32)}...\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('pbkdf2-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    function testEvpKDF() {
+      try {
+        const password = 'my-password';
+        const salt = 'salt-value';
+        const keySize = 256 / 32;
+        const iterations = 1000;
+
+        const derivedKey = CryptoJS.EvpKDF(password, salt, {
+          keySize: keySize,
+          iterations: iterations
+        }).toString();
+
+        showResult('evpkdf-result',
+          `✓ EvpKDF successful!\n` +
+          `Password: "${password}"\n` +
+          `Salt: "${salt}"\n` +
+          `Iterations: ${iterations}\n` +
+          `Key size: ${keySize * 32} bits\n` +
+          `Derived key (hex): ${derivedKey.substring(0, 32)}...\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('evpkdf-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    function testDES() {
+      try {
+        const key = 'secret-key-123';
+        const message = 'Hello, DES!';
+
+        const encrypted = CryptoJS.DES.encrypt(message, key, {
+          mode: CryptoJS.mode.CBC,
+          padding: CryptoJS.pad.Pkcs7
+        });
+
+        showResult('des-result',
+          `✓ DES-CBC encryption successful!\n` +
+          `Message: "${message}"\n` +
+          `Mode: CBC\n` +
+          `Padding: PKCS7\n` +
+          `Ciphertext: ${encrypted.ciphertext.toString()}\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('des-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    function testDES_ECB() {
+      try {
+        const key = 'secret-key-123';
+        const message = 'Hello, DES ECB!';
+
+        const encrypted = CryptoJS.DES.encrypt(message, key, {
+          mode: CryptoJS.mode.ECB,
+          padding: CryptoJS.pad.ZeroPadding
+        });
+
+        showResult('des-result',
+          `✓ DES-ECB encryption successful!\n` +
+          `Message: "${message}"\n` +
+          `Mode: ECB\n` +
+          `Padding: ZeroPadding\n` +
+          `Ciphertext: ${encrypted.ciphertext.toString()}\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('des-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    function testTripleDES() {
+      try {
+        const key = 'very-long-secret-key-for-3des';
+        const message = 'Hello, TripleDES!';
+
+        const encrypted = CryptoJS.TripleDES.encrypt(message, key, {
+          mode: CryptoJS.mode.CBC,
+          padding: CryptoJS.pad.Pkcs7
+        });
+
+        showResult('tripledes-result',
+          `✓ TripleDES encryption successful!\n` +
+          `Message: "${message}"\n` +
+          `Mode: CBC\n` +
+          `Ciphertext: ${encrypted.ciphertext.toString()}\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('tripledes-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    function testRabbit() {
+      try {
+        const key = 'secret-key';
+        const message = 'Hello, Rabbit!';
+
+        const encrypted = CryptoJS.Rabbit.encrypt(message, key);
+
+        showResult('stream-result',
+          `✓ Rabbit encryption successful!\n` +
+          `Message: "${message}"\n` +
+          `Ciphertext: ${encrypted.ciphertext.toString()}\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('stream-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    function testRC4() {
+      try {
+        const key = 'secret-key';
+        const message = 'Hello, RC4!';
+
+        const encrypted = CryptoJS.RC4.encrypt(message, key);
+
+        showResult('stream-result',
+          `✓ RC4 encryption successful!\n` +
+          `Message: "${message}"\n` +
+          `Ciphertext: ${encrypted.ciphertext.toString()}\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('stream-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    function testAES_CBC() {
+      try {
+        const key = 'secret-key-123456';
+        const message = 'Hello, AES-CBC!';
+
+        const encrypted = CryptoJS.AES.encrypt(message, key, {
+          mode: CryptoJS.mode.CBC,
+          padding: CryptoJS.pad.Pkcs7
+        });
+
+        showResult('aes-modes-result',
+          `✓ AES-CBC encryption successful!\n` +
+          `Message: "${message}"\n` +
+          `Mode: CBC\n` +
+          `Padding: PKCS7\n` +
+          `Check DevTools panel for captured log with mode details.`
+        );
+      } catch (error) {
+        showResult('aes-modes-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    function testAES_CTR() {
+      try {
+        const key = 'secret-key-123456';
+        const message = 'Hello, AES-CTR!';
+
+        const encrypted = CryptoJS.AES.encrypt(message, key, {
+          mode: CryptoJS.mode.CTR,
+          padding: CryptoJS.pad.NoPadding
+        });
+
+        showResult('aes-modes-result',
+          `✓ AES-CTR encryption successful!\n` +
+          `Message: "${message}"\n` +
+          `Mode: CTR\n` +
+          `Padding: NoPadding\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('aes-modes-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    function testAES_OFB() {
+      try {
+        const key = 'secret-key-123456';
+        const message = 'Hello, AES-OFB!';
+
+        const encrypted = CryptoJS.AES.encrypt(message, key, {
+          mode: CryptoJS.mode.OFB
+        });
+
+        showResult('aes-modes-result',
+          `✓ AES-OFB encryption successful!\n` +
+          `Message: "${message}"\n` +
+          `Mode: OFB\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('aes-modes-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    function testAES_GCM() {
+      try {
+        const key = 'secret-key-123456';
+        const message = 'Hello, AES-CFB!';
+
+        const encrypted = CryptoJS.AES.encrypt(message, key, {
+          mode: CryptoJS.mode.CFB
+        });
+
+        showResult('aes-modes-result',
+          `✓ AES-CFB encryption successful!\n` +
+          `Message: "${message}"\n` +
+          `Mode: CFB\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('aes-modes-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    // ============================================
+    // Forge.js Tests
+    // ============================================
+
+    function testForgePBKDF2() {
+      try {
+        const password = 'my-password';
+        const salt = forge.util.encodeUtf8('random-salt');
+        const iterations = 1000;
+        const keySize = 32; // 256 bits
+
+        const derivedKey = forge.pbkdf2(password, salt, iterations, keySize, 'sha256');
+
+        showResult('forge-pbkdf2-result',
+          `✓ Forge PBKDF2 successful!\n` +
+          `Password: "${password}"\n` +
+          `Iterations: ${iterations}\n` +
+          `Key size: ${keySize * 8} bits\n` +
+          `Derived key (hex): ${derivedKey.substring(0, 32)}...\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('forge-pbkdf2-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    function testForgeHMAC() {
+      try {
+        const key = 'secret-key';
+        const message = 'Hello, Forge HMAC!';
+
+        const hmac = forge.hmac.create();
+        hmac.start('sha256', key);
+        hmac.update(message, 'utf8');
+        const result = hmac.digest().toHex();
+
+        showResult('forge-hmac-result',
+          `✓ Forge HMAC-SHA256 successful!\n` +
+          `Key: "${key}"\n` +
+          `Message: "${message}"\n` +
+          `HMAC (hex): ${result.substring(0, 32)}...\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('forge-hmac-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    // RSA key pair for testing
+    let rsaKeyPair = null;
+
+    function testForgeRSAEncrypt() {
+      try {
+        // Generate key pair if not exists
+        if (!rsaKeyPair) {
+          rsaKeyPair = forge.pki.rsa.generateKeyPair(2048);
+        }
+
+        const message = 'Hello, RSA!';
+        const encrypted = rsaKeyPair.publicKey.encrypt(message, 'RSA-OAEP', {
+          md: forge.md.sha256.create()
+        });
+
+        showResult('forge-rsa-result',
+          `✓ RSA encryption successful!\n` +
+          `Message: "${message}"\n` +
+          `Scheme: RSA-OAEP\n` +
+          `Ciphertext (base64): ${encrypted.substring(0, 50)}...\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('forge-rsa-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    function testForgeRSADecrypt() {
+      try {
+        // Generate key pair if not exists
+        if (!rsaKeyPair) {
+          rsaKeyPair = forge.pki.rsa.generateKeyPair(2048);
+        }
+
+        const message = 'Hello, RSA!';
+        const encrypted = rsaKeyPair.publicKey.encrypt(message, 'RSA-OAEP', {
+          md: forge.md.sha256.create()
+        });
+
+        const decrypted = rsaKeyPair.privateKey.decrypt(encrypted, 'RSA-OAEP', {
+          md: forge.md.sha256.create()
+        });
+
+        showResult('forge-rsa-result',
+          `✓ RSA decryption successful!\n` +
+          `Decrypted message: "${decrypted}"\n` +
+          `Scheme: RSA-OAEP\n` +
+          `Check DevTools panel for captured logs (encrypt & decrypt).`
+        );
+      } catch (error) {
+        showResult('forge-rsa-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    function testForgeRSASign() {
+      try {
+        // Generate key pair if not exists
+        if (!rsaKeyPair) {
+          rsaKeyPair = forge.pki.rsa.generateKeyPair(2048);
+        }
+
+        const message = 'Hello, RSA Signature!';
+        const md = forge.md.sha256.create();
+        md.update(message, 'utf8');
+
+        const signature = rsaKeyPair.privateKey.sign(md);
+
+        showResult('forge-rsa-sig-result',
+          `✓ RSA signing successful!\n` +
+          `Message: "${message}"\n` +
+          `Hash: SHA256\n` +
+          `Signature (hex): ${signature.substring(0, 50)}...\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('forge-rsa-sig-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    function testForgeRSAVerify() {
+      try {
+        // Generate key pair if not exists
+        if (!rsaKeyPair) {
+          rsaKeyPair = forge.pki.rsa.generateKeyPair(2048);
+        }
+
+        const message = 'Hello, RSA Signature!';
+        const md = forge.md.sha256.create();
+        md.update(message, 'utf8');
+
+        const signature = rsaKeyPair.privateKey.sign(md);
+
+        // Verify
+        const md2 = forge.md.sha256.create();
+        md2.update(message, 'utf8');
+        const verified = rsaKeyPair.publicKey.verify(md2.digest().bytes(), signature);
+
+        showResult('forge-rsa-sig-result',
+          `✓ RSA verification successful!\n` +
+          `Message: "${message}"\n` +
+          `Verified: ${verified}\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('forge-rsa-sig-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    function testForgeRandom() {
+      try {
+        const bytes = forge.random.getBytes(16);
+        const hex = forge.util.bytesToHex(bytes);
+
+        showResult('forge-random-result',
+          `✓ Random.getBytes successful!\n` +
+          `Byte count: 16\n` +
+          `Random bytes (hex): ${hex}\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('forge-random-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    // ============================================
+    // libsodium.js Tests (P2/P3)
+    // ============================================
+
+    async function waitForSodium() {
+      if (window._sodium) {
+        return window._sodium.ready;
+      }
+      if (window.sodium) {
+        return Promise.resolve();
+      }
+      // Wait for sodium to load
+      return new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    async function testSodiumXChaCha20() {
+      try {
+        await waitForSodium();
+        const sodium = window.sodium || window._sodium;
+
+        const message = sodium.from_string('Hello, libsodium!');
+        const additionalData = sodium.from_string('additional');
+        const nonce = sodium.randombytes_buf(sodium.crypto_aead_xchacha20poly1305_ietf_noncebytes());
+        const key = sodium.randombytes_buf(sodium.crypto_aead_xchacha20poly1305_ietf_keybytes());
+
+        const encrypted = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(message, additionalData, null, nonce, key);
+
+        showResult('sodium-xchacha20-result',
+          `✓ XChaCha20-Poly1305-IETF encryption successful!\n` +
+          `Message: "Hello, libsodium!"\n` +
+          `Additional data: present\n` +
+          `Ciphertext length: ${encrypted.length} bytes\n` +
+          `Check DevTools panel for performance timing and stack trace.`
+        );
+      } catch (error) {
+        showResult('sodium-xchacha20-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    async function testSodiumSign() {
+      try {
+        await waitForSodium();
+        const sodium = window.sodium || window._sodium;
+
+        const { publicKey, privateKey } = sodium.crypto_sign_keypair();
+        const message = sodium.from_string('Hello, Ed25519!');
+        const signature = sodium.crypto_sign(message, privateKey);
+
+        showResult('sodium-sign-result',
+          `✓ Ed25519 signing successful!\n` +
+          `Message: "Hello, Ed25519!"\n` +
+          `Signature length: ${signature.length} bytes\n` +
+          `Public key: ${sodium.to_hex(publicKey).substring(0, 16)}...\n` +
+          `Check DevTools panel for stack trace.`
+        );
+      } catch (error) {
+        showResult('sodium-sign-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    async function testSodiumVerify() {
+      try {
+        await waitForSodium();
+        const sodium = window.sodium || window._sodium;
+
+        const { publicKey, privateKey } = sodium.crypto_sign_keypair();
+        const message = sodium.from_string('Hello, Ed25519!');
+        const signedMessage = sodium.crypto_sign(message, privateKey);
+
+        const verifiedMessage = sodium.crypto_sign_open(signedMessage, publicKey);
+
+        showResult('sodium-sign-result',
+          `✓ Ed25519 verification successful!\n` +
+          `Verified message: "${sodium.to_string(verifiedMessage)}"\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('sodium-sign-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    async function testSodiumArgon2() {
+      try {
+        await waitForSodium();
+        const sodium = window.sodium || window._sodium;
+
+        const password = sodium.from_string('secure-password');
+        const salt = sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES);
+        const opsLimit = sodium.crypto_pwhash_opslimit_moderate;
+        const memLimit = sodium.crypto_pwhash_memlimit_moderate;
+
+        const hash = sodium.crypto_pwhash(
+          sodium.crypto_pwhash_BYTES,
+          password,
+          salt,
+          opsLimit,
+          memLimit,
+          sodium.crypto_pwhash_alg_argon2id13
+        );
+
+        showResult('sodium-argon2-result',
+          `✓ Argon2ID hashing successful!\n` +
+          `Password: "secure-password"\n` +
+          `Ops limit: ${opsLimit}\n` +
+          `Memory limit: ${memLimit / 1024 / 1024} MB\n` +
+          `Hash length: ${hash.length} bytes\n` +
+          `Check DevTools panel for execution time!`
+        );
+      } catch (error) {
+        showResult('sodium-argon2-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    async function testSodiumBlake2() {
+      try {
+        await waitForSodium();
+        const sodium = window.sodium || window._sodium;
+
+        const message = sodium.from_string('Hello, BLAKE2b!');
+        const hash = sodium.crypto_generichash(message);
+
+        showResult('sodium-blake2-result',
+          `✓ BLAKE2b hashing successful!\n` +
+          `Message: "Hello, BLAKE2b!"\n` +
+          `Hash (hex): ${sodium.to_hex(hash)}\n` +
+          `Check DevTools panel for captured log.`
+        );
+      } catch (error) {
+        showResult('sodium-blake2-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    async function testSodiumSecretBox() {
+      try {
+        await waitForSodium();
+        const sodium = window.sodium || window._sodium;
+
+        const message = sodium.from_string('Hello, SecretBox!');
+        const nonce = sodium.randombytes_buf(sodium.crypto_secretbox_noncebytes());
+        const key = sodium.randombytes_buf(sodium.crypto_secretbox_keybytes());
+
+        const encrypted = sodium.crypto_secretbox_easy(message, nonce, key);
+
+        showResult('sodium-secretbox-result',
+          `✓ XSalsa20-Poly1305 encryption successful!\n` +
+          `Message: "Hello, SecretBox!"\n` +
+          `Ciphertext length: ${encrypted.length} bytes\n` +
+          `Check DevTools panel for stack trace.`
+        );
+      } catch (error) {
+        showResult('sodium-secretbox-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    // ============================================
+    // P3 Feature Tests
+    // ============================================
+
+    async function testPerformanceMonitoring() {
+      try {
+        // Generate large RSA key (slow operation)
+        const keyPair = await crypto.subtle.generateKey(
+          { name: 'RSASSA-PKCS1-v1_5', modulusLength: 4096, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' },
+          true,
+          ['sign', 'verify']
+        );
+
+        showResult('performance-result',
+          `✓ Performance monitoring test complete!\n` +
+          `Generated 4096-bit RSA key pair\n` +
+          `Check the DevTools panel for 'execution_time_ms' field in the log.\n` +
+          `This should show how long the key generation took.`
+        );
+      } catch (error) {
+        showResult('performance-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    function testWeakCryptoWarning() {
+      try {
+        const message = 'Hello, MD5!';
+        const hash = CryptoJS.MD5(message).toString();
+
+        showResult('weak-crypto-result',
+          `✓ MD5 hash generated: ${hash}\n` +
+          `Check DevTools panel for the 'warning' field.\n` +
+          `It should show: ⚠️ WEAK CRYPTO: MD5 is cryptographically broken.`
+        );
+      } catch (error) {
+        showResult('weak-crypto-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    function testWeakCryptoWarning2() {
+      try {
+        const key = 'secret-key-123';
+        const message = 'Hello, DES!';
+
+        const encrypted = CryptoJS.DES.encrypt(message, key, {
+          mode: CryptoJS.mode.CBC,
+          padding: CryptoJS.pad.Pkcs7
+        });
+
+        showResult('weak-crypto-result',
+          `✓ DES encryption complete\n` +
+          `Check DevTools panel for the 'warning' field.\n` +
+          `It should show: ⚠️ WEAK CRYPTO: DES is considered weak and deprecated.`
+        );
+      } catch (error) {
+        showResult('weak-crypto-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    async function testStackTrace() {
+      try {
+        // Nested function call to test stack trace
+        function level3() {
+          return CryptoJS.SHA256('Stack trace test').toString();
+        }
+
+        function level2() {
+          return level3();
+        }
+
+        function level1() {
+          return level2();
+        }
+
+        const hash = level1();
+
+        showResult('stack-trace-result',
+          `✓ SHA256 hash: ${hash.substring(0, 16)}...\n` +
+          `Check DevTools panel for 'stack_trace' field.\n` +
+          `It should show the call stack from level3 → level2 → level1.`
+        );
+      } catch (error) {
+        showResult('stack-trace-result', `✗ Error: ${error.message}`, false);
+      }
+    }
+
+    // ============================================
+    // Run All Tests
+    // ============================================
+
+    async function runAllTests() {
+      const results = [];
+
+      // Web Crypto API tests
+      results.push('Testing Web Crypto API...');
+
+      try {
+        await testDeriveKey();
+        results.push('✓ deriveKey');
+        await new Promise(r => setTimeout(r, 100));
+      } catch (e) { results.push('✗ deriveKey: ' + e.message); }
+
+      try {
+        await testDeriveBits();
+        results.push('✓ deriveBits');
+        await new Promise(r => setTimeout(r, 100));
+      } catch (e) { results.push('✗ deriveBits: ' + e.message); }
+
+      try {
+        await testVerify();
+        results.push('✓ verify');
+        await new Promise(r => setTimeout(r, 100));
+      } catch (e) { results.push('✗ verify: ' + e.message); }
+
+      try {
+        await testGenerateKey();
+        results.push('✓ generateKey');
+        await new Promise(r => setTimeout(r, 100));
+      } catch (e) { results.push('✗ generateKey: ' + e.message); }
+
+      try {
+        await testImportExportKey();
+        results.push('✓ importKey/exportKey');
+        await new Promise(r => setTimeout(r, 100));
+      } catch (e) { results.push('✗ importKey/exportKey: ' + e.message); }
+
+      // CryptoJS tests
+      results.push('\nTesting CryptoJS...');
+
+      try {
+        testHmacSHA256();
+        results.push('✓ HMAC-SHA256');
+        await new Promise(r => setTimeout(r, 100));
+      } catch (e) { results.push('✗ HMAC-SHA256: ' + e.message); }
+
+      try {
+        testHmacSHA1();
+        results.push('✓ HMAC-SHA1');
+        await new Promise(r => setTimeout(r, 100));
+      } catch (e) { results.push('✗ HMAC-SHA1: ' + e.message); }
+
+      try {
+        testHmacMD5();
+        results.push('✓ HMAC-MD5');
+        await new Promise(r => setTimeout(r, 100));
+      } catch (e) { results.push('✗ HMAC-MD5: ' + e.message); }
+
+      try {
+        testPBKDF2();
+        results.push('✓ PBKDF2');
+        await new Promise(r => setTimeout(r, 100));
+      } catch (e) { results.push('✗ PBKDF2: ' + e.message); }
+
+      try {
+        testEvpKDF();
+        results.push('✓ EvpKDF');
+        await new Promise(r => setTimeout(r, 100));
+      } catch (e) { results.push('✗ EvpKDF: ' + e.message); }
+
+      results.push('\n✅ All tests completed! Check the DevTools panel for captured logs.');
+
+      const el = document.getElementById('allTests-result');
+      el.style.display = 'block';
+      el.textContent = results.join('\n');
+      el.className = 'result success';
+    }
+  </script>
+</body>
+</html>

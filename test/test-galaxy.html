@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto-Detective Galaxy Generator Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #0969da;
+            padding-bottom: 10px;
+        }
+        .section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            color: #0969da;
+            margin-top: 0;
+        }
+        button {
+            background-color: #0969da;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0860ca;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .result {
+            background: #f6f8fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+        .info {
+            background: #e1f0ff;
+            border-left: 4px solid #0969da;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+    <!-- Load CryptoJS for testing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <!-- Load JSEncrypt for testing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.3.2/jsencrypt.min.js"></script>
+</head>
+<body>
+    <h1>Crypto-Detective Galaxy Generator Test Page</h1>
+
+    <div class="info">
+        <strong>Instructions:</strong>
+        <ol>
+            <li>Open Chrome DevTools (F12)</li>
+            <li>Go to the "Crypto Detective" tab</li>
+            <li>Click "Generate Galaxy Script" button</li>
+            <li>Use the buttons below to test different encryption methods</li>
+            <li>Captured operations will appear in the Crypto Detective panel</li>
+        </ol>
+    </div>
+
+    <!-- Test 1: AES-CBC Encryption -->
+    <div class="section">
+        <h2>Test 1: AES-CBC Encryption (CryptoJS)</h2>
+        <p>This test encrypts data using AES-CBC mode with a static key and IV.</p>
+        <input type="text" id="aes-input" placeholder="Enter text to encrypt" value="Hello Crypto-Detective!">
+        <br><br>
+        <button onclick="testAESCBC()">Encrypt with AES-CBC</button>
+        <button onclick="testAESECB()">Encrypt with AES-ECB</button>
+        <button onclick="testAESGCM()">Encrypt with AES-GCM</button>
+        <div class="result" id="aes-result">Result will appear here...</div>
+    </div>
+
+    <!-- Test 2: RSA Encryption -->
+    <div class="section">
+        <h2>Test 2: RSA Encryption (JSEncrypt)</h2>
+        <p>This test encrypts data using RSA with a sample key pair.</p>
+        <input type="text" id="rsa-input" placeholder="Enter text to encrypt" value="Secret message">
+        <br><br>
+        <button onclick="testRSAEncrypt()">Encrypt with RSA</button>
+        <button onclick="testRSADecrypt()">Decrypt with RSA</button>
+        <div class="result" id="rsa-result">Result will appear here...</div>
+    </div>
+
+    <!-- Test 3: DES Encryption -->
+    <div class="section">
+        <h2>Test 3: DES Encryption (CryptoJS)</h2>
+        <p>This test encrypts data using DES-CBC mode.</p>
+        <input type="text" id="des-input" placeholder="Enter text to encrypt" value="DES Test Data">
+        <br><br>
+        <button onclick="testDESCBC()">Encrypt with DES-CBC</button>
+        <button onclick="testDESCBCDecrypt()">Decrypt with DES-CBC</button>
+        <div class="result" id="des-result">Result will appear here...</div>
+    </div>
+
+    <!-- Test 4: SHA Hashing -->
+    <div class="section">
+        <h2>Test 4: SHA-256 Hashing (CryptoJS)</h2>
+        <p>This test hashes data using SHA-256.</p>
+        <input type="text" id="hash-input" placeholder="Enter text to hash" value="Hash me!">
+        <br><br>
+        <button onclick="testSHA256()">Hash with SHA-256</button>
+        <button onclick="testMD5()">Hash with MD5</button>
+        <div class="result" id="hash-result">Result will appear here...</div>
+    </div>
+
+    <!-- Test 5: Triple DES -->
+    <div class="section">
+        <h2>Test 5: Triple DES Encryption (CryptoJS)</h2>
+        <p>This test encrypts data using TripleDES-CBC mode.</p>
+        <input type="text" id="3des-input" placeholder="Enter text to encrypt" value="TripleDES Test">
+        <br><br>
+        <button onclick="testTripleDES()">Encrypt with TripleDES-CBC</button>
+        <div class="result" id="3des-result">Result will appear here...</div>
+    </div>
+
+    <div class="info">
+        <strong>Expected Results:</strong>
+        <ul>
+            <li>All encryption operations should be captured by Crypto-Detective</li>
+            <li>Each operation shows library, method, key, IV, and ciphertext</li>
+            <li>In Galaxy Generator, you should see detected algorithms</li>
+            <li>Select an algorithm and generate a script</li>
+            <li>The script should include captured keys and IVs</li>
+        </ul>
+    </div>
+
+    <script>
+        // Test keys - using static keys for reproducibility
+        const AES_KEY = CryptoJS.enc.Utf8.parse("32byteslongsecretkeyforaes256!aa");
+        const AES_IV = CryptoJS.enc.Utf8.parse("16byteslongiv456");
+        const DES_KEY = CryptoJS.enc.Utf8.parse("8bytekey");
+        const DES_IV = CryptoJS.enc.Utf8.parse("8byteiv");
+        const TRIPLEDES_KEY = CryptoJS.enc.Utf8.parse("24byteslongdeskey!!");
+
+        // RSA Test Keys (sample key pair)
+        const RSA_PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC7JoQAWLsovzHjaUMZg2lwO4L
+CuP97mitUc4chqRlQD3NgyCWLqEnYyM+OJ7i6cyMuWLwGtMi29DoKLjpE/xRZR0O
+Uk46PDCAtyDgIyejK7c7KlZTbiqb4PtiJNLZgg0UP62kLMycnpY/wg/R2G9g+7Mi
+JWUV5SR+Lhryv8CWezQIDAQAB
+-----END PUBLIC KEY-----`;
+
+        const RSA_PRIVATE_KEY = `-----BEGIN RSA PRIVATE KEY-----
+MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBALsmhABYuyi/MeNp
+QxmDaXA7gsK4/3uaK1RzhyGpGVAPc2DIJYuoSdjIz44nuLpzIy5YvAa0yLb0OgouO
+kT/FFlHQ5STjo8MIC3IOAjJ6MrtzsqVlNuKpvg+2Ik0tmCDRQ/raQszJyelj/CD9
+HYb2D7syIlZRXlJH4uGvK/wJZ7NAgMBAAECgYAhgbhRbZF4rp6Kdh6e00HN58G2B
+jQrl4MZeCOh+aoABPwlwD/EnMk36GAMtfzjWNjcI+PqGXT0GI7JotQo5ThpoweXX
+/uoeGOW+UkYLA6a67lmxfoZsDtY2+jnaWIs2c7Itz3ClRxo4tYwCoPNjtaBpMfPg
+ZaYg2QN8/wLQPI66wJBAM0xpjb2OlLDs75lVxbm6v6Dx3YBS20GSqJqvf+14a/k7
+mrZ3PmAHOfqTqKOwbVQJmLbeOpU+sUBpeLpILKOCLcCQQDpfSsDhdosC6qTL9XnF
+2jS49iws2RBKw5YjDkClwA6VMNj5uzL1Rl7/AimLRMnB4BwrD95ksuOJsqNXW6wR
+GibAkAkk28PaQCodB38GFBX0r2ctJy/Wie5vV9caC6KAD/EfMhK357WEpIUfN2be
+FrrGOhewsRg8NjqeQq60dd0PIEtAkBYAm03O7n8Bj26kzpejA1gCLBCEqyEf/U9XU
+WT+1UDp7Wqr32sa1vaxyp/cNgaSxKX5eVbLwD5SRfqZ0B0wqRnAkATpUNiCqjQVS
++OI5dwjoI1Rx3oI8pyKWOg3+QIHIRgL3pc8HLdZ2BkX4Vf6ANb4+noQnD/di1Mj+0
+pUL8RhIJE
+-----END RSA PRIVATE KEY-----`;
+
+        // Test 1: AES-CBC
+        function testAESCBC() {
+            const plaintext = document.getElementById('aes-input').value;
+            const encrypted = CryptoJS.AES.encrypt(plaintext, AES_KEY, {
+                iv: AES_IV,
+                mode: CryptoJS.mode.CBC,
+                padding: CryptoJS.pad.Pkcs7
+            });
+            document.getElementById('aes-result').textContent =
+                'Encrypted: ' + encrypted.toString();
+        }
+
+        function testAESECB() {
+            const plaintext = document.getElementById('aes-input').value;
+            const encrypted = CryptoJS.AES.encrypt(plaintext, AES_KEY, {
+                mode: CryptoJS.mode.ECB,
+                padding: CryptoJS.pad.Pkcs7
+            });
+            document.getElementById('aes-result').textContent =
+                'Encrypted: ' + encrypted.toString();
+        }
+
+        function testAESGCM() {
+            const plaintext = document.getElementById('aes-input').value;
+            const iv = CryptoJS.lib.WordArray.random(12);
+            const encrypted = CryptoJS.AES.encrypt(plaintext, AES_KEY, {
+                iv: iv,
+                mode: CryptoJS.mode.GCM,
+                padding: CryptoJS.pad.NoPadding
+            });
+            document.getElementById('aes-result').textContent =
+                'Encrypted: ' + encrypted.toString();
+        }
+
+        // Test 2: RSA
+        function testRSAEncrypt() {
+            const plaintext = document.getElementById('rsa-input').value;
+            const encrypt = new JSEncrypt();
+            encrypt.setPublicKey(RSA_PUBLIC_KEY);
+            const encrypted = encrypt.encrypt(plaintext);
+            document.getElementById('rsa-result').textContent =
+                'Encrypted: ' + encrypted;
+        }
+
+        function testRSADecrypt() {
+            const plaintext = document.getElementById('rsa-input').value;
+            const encrypt = new JSEncrypt();
+            encrypt.setPublicKey(RSA_PUBLIC_KEY);
+            const encrypted = encrypt.encrypt(plaintext);
+
+            const decrypt = new JSEncrypt();
+            decrypt.setPrivateKey(RSA_PRIVATE_KEY);
+            const decrypted = decrypt.decrypt(encrypted);
+            document.getElementById('rsa-result').textContent =
+                'Decrypted: ' + decrypted;
+        }
+
+        // Test 3: DES-CBC
+        function testDESCBC() {
+            const plaintext = document.getElementById('des-input').value;
+            const encrypted = CryptoJS.DES.encrypt(plaintext, DES_KEY, {
+                iv: DES_IV,
+                mode: CryptoJS.mode.CBC,
+                padding: CryptoJS.pad.Pkcs7
+            });
+            document.getElementById('des-result').textContent =
+                'Encrypted: ' + encrypted.toString();
+        }
+
+        function testDESCBCDecrypt() {
+            const plaintext = document.getElementById('des-input').value;
+            const encrypted = CryptoJS.DES.encrypt(plaintext, DES_KEY, {
+                iv: DES_IV,
+                mode: CryptoJS.mode.CBC,
+                padding: CryptoJS.pad.Pkcs7
+            });
+
+            const decrypted = CryptoJS.DES.decrypt(encrypted, DES_KEY, {
+                iv: DES_IV,
+                mode: CryptoJS.mode.CBC,
+                padding: CryptoJS.pad.Pkcs7
+            });
+            document.getElementById('des-result').textContent =
+                'Decrypted: ' + decrypted.toString(CryptoJS.enc.Utf8);
+        }
+
+        // Test 4: SHA-256
+        function testSHA256() {
+            const plaintext = document.getElementById('hash-input').value;
+            const hash = CryptoJS.SHA256(plaintext);
+            document.getElementById('hash-result').textContent =
+                'SHA-256 Hash: ' + hash.toString();
+        }
+
+        function testMD5() {
+            const plaintext = document.getElementById('hash-input').value;
+            const hash = CryptoJS.MD5(plaintext);
+            document.getElementById('hash-result').textContent =
+                'MD5 Hash: ' + hash.toString();
+        }
+
+        // Test 5: Triple DES
+        function testTripleDES() {
+            const plaintext = document.getElementById('3des-input').value;
+            const iv = CryptoJS.enc.Utf8.parse("8byteiv");
+            const encrypted = CryptoJS.TripleDES.encrypt(plaintext, TRIPLEDES_KEY, {
+                iv: iv,
+                mode: CryptoJS.mode.CBC,
+                padding: CryptoJS.pad.Pkcs7
+            });
+            document.getElementById('3des-result').textContent =
+                'Encrypted: ' + encrypted.toString();
+        }
+
+        // Auto-run one test on page load
+        window.addEventListener('load', () => {
+            console.log('Crypto-Detective Galaxy Generator Test Page Loaded');
+            console.log('Click the test buttons to generate crypto operations');
+        });
+    </script>
+</body>
+</html>

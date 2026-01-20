@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Detective</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="header">
+        <div class="title">
+            <h1>Crypto Detective</h1>
+        </div>
+        <div class="controls">
+            <label for="monitoring-toggle" id="monitoring-label">Monitoring</label>
+            <label class="switch">
+                <input type="checkbox" id="monitoring-toggle">
+                <span class="slider"></span>
+            </label>
+            <button id="clear-logs-btn" title="Clear all captured logs">Clear Logs</button>
+        </div>
+    </div>
+
+    <div id="logs-container">
+        <div id="no-logs-message" class="empty-state">
+            No cryptographic operations captured yet.
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

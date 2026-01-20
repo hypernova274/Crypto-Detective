@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Crypto Detective Panel</title>
+    <link rel="stylesheet" href="panel.css" />
+  </head>
+  <body>
+    <div class="toolbar">
+      <button id="clear-logs-btn" title="Clear all captured logs">Clear</button>
+      <button id="galaxy-generator-btn" title="Generate Galaxy script for Burp Suite">Generate Galaxy Script</button>
+      <div class="search-wrapper">
+        <input type="search" id="search-input" placeholder="Search logs (e.g., 'AES', 'RSA', 'example.com')" />
+      </div>
+      <fieldset class="filters">
+        <legend>Filter by library:</legend>
+        <label><input type="checkbox" class="filter-lib" value="Web Crypto API" checked /> Web Crypto</label>
+        <label><input type="checkbox" class="filter-lib" value="CryptoJS" checked /> CryptoJS</label>
+        <label><input type="checkbox" class="filter-lib" value="JSEncrypt" checked /> JSEncrypt</label>
+        <label><input type="checkbox" class="filter-lib" value="Forge.js" checked /> Forge.js</label>
+        <label><input type="checkbox" class="filter-lib" value="BigInteger.js (jsbn)" checked /> BigInteger</label>
+      </fieldset>
+    </div>
+
+    <!-- Galaxy Script Generator Panel -->
+    <div id="galaxy-panel" class="galaxy-panel">
+      <div class="galaxy-panel-header">
+        <h3>Galaxy Script Generator</h3>
+        <button id="close-galaxy-panel" class="close-btn">&times;</button>
+      </div>
+
+      <div class="galaxy-panel-content">
+        <!-- Selected Crypto Record Section -->
+        <div class="galaxy-section">
+          <h4>1. Selected Crypto Record</h4>
+          <div id="selected-crypto-record" class="crypto-record-details">
+            <div class="empty-state">No record selected. Click "Generate" button on a log row.</div>
+          </div>
+        </div>
+
+        <!-- Template Section -->
+        <div class="galaxy-section">
+          <h4>2. Matched Template</h4>
+          <div id="matched-template" class="template-display">
+            <div class="empty-state">No template matched yet.</div>
+          </div>
+        </div>
+
+        <!-- Prompt Section -->
+        <div class="galaxy-section">
+          <h4>3. AI Prompt (Optional)</h4>
+          <textarea id="ai-prompt" rows="6" placeholder="添加自定义指令..."></textarea>
+          <div style="margin-top: 8px;">
+            <button id="use-prompt-template-btn" class="btn-small">使用专业模板</button>
+            <button id="clear-prompt-btn" class="btn-small">清空</button>
+            <small style="display: block; margin-top: 4px;">所有设置（API Key、提示词等）会自动保存到本地</small>
+          </div>
+        </div>
+
+        <!-- Configuration Section -->
+        <div class="galaxy-section">
+          <h4>4. Script Configuration</h4>
+          <div class="config-grid">
+            <div class="config-item">
+              <label for="script-language">Script Language:</label>
+              <select id="script-language">
+                <option value="python">Python (GraalPy)</option>
+                <option value="javascript">JavaScript (GraalJS)</option>
+              </select>
+            </div>
+            <div class="config-item">
+              <label for="json-key">Data Field Name (jsonKey):</label>
+              <input type="text" id="json-key" value="data" placeholder="e.g., data, encrypted" />
+            </div>
+            <div class="config-item">
+              <label for="encoding-type">Data Encoding:</label>
+              <select id="encoding-type">
+                <option value="base64">Base64</option>
+                <option value="hex">Hex</option>
+                <option value="raw">Raw (no encoding)</option>
+              </select>
+            </div>
+            <div class="config-item">
+              <label for="use-ai">
+                <input type="checkbox" id="use-ai" />
+                Use AI Generation
+              </label>
+              <small>Generate script using AI with template + crypto info + prompt</small>
+            </div>
+            <div class="config-item" id="ai-provider-config" style="display: none;">
+              <label for="ai-provider">AI Provider:</label>
+              <select id="ai-provider">
+                <option value="CLAUDE">Claude (Anthropic)</option>
+                <option value="OPENAI">GPT-4 (OpenAI)</option>
+                <option value="GLM">GLM-4 (智谱AI)</option>
+              </select>
+            </div>
+            <div class="config-item" id="api-key-config" style="display: none;">
+              <label for="api-key">API Key:</label>
+              <input type="password" id="api-key" placeholder="Enter your API key" />
+              <small><a href="#" id="get-api-key-link">Get API key</a></small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Generate Button Section -->
+        <div class="galaxy-section">
+          <button id="generate-script-btn" class="btn-primary">Generate Galaxy Script</button>
+        </div>
+
+        <!-- AI Generation Log Section -->
+        <div id="ai-log-section" class="galaxy-section" style="display: none;">
+          <h4>AI Generation Log</h4>
+          <div class="output-actions">
+            <button id="copy-log-btn" class="btn-small">Copy Log</button>
+            <button id="clear-log-btn" class="btn-small">Clear</button>
+          </div>
+          <div id="ai-log-output" class="ai-log-output"></div>
+        </div>
+
+        <!-- Output Section -->
+        <div id="output-section" class="galaxy-section" style="display: none;">
+          <h4>Generated Script</h4>
+          <div class="output-actions">
+            <button id="copy-script-btn" class="btn-small">Copy</button>
+            <button id="download-script-btn" class="btn-small">Download</button>
+          </div>
+          <textarea id="generated-script" readonly></textarea>
+          <div id="script-warnings" class="script-warnings"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table id="logs-table">
+        <thead>
+          <tr>
+            <th class="col-time">Time</th>
+            <th class="col-lib">Library</th>
+            <th class="col-method">Method</th>
+            <th class="col-data">Details</th>
+            <th class="col-origin">Origin</th>
+            <th class="col-galaxy">Generate Galaxy Script</th>
+          </tr>
+        </thead>
+        <tbody id="logs-tbody">
+          <!-- Log rows will be inserted here by panel.js -->
+        </tbody>
+      </table>
+      <div id="no-logs-message" class="empty-state">
+        No cryptographic operations have been captured yet.
+      </div>
+      <div id="no-results-message" class="empty-state" style="display: none;">
+        No logs match the current search or filter criteria.
+      </div>
+    </div>
+
+    <script src="galaxyGenerator.js"></script>
+    <script src="galaxyTemplates.js"></script>
+    <script src="aiScriptGenerator.js"></script>
+    <script src="templateLoader.js"></script>
+    <script src="panel.js"></script>
+  </body>
+</html>
